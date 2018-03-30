@@ -7,6 +7,18 @@ _user$project$App_ops['||>'] = F2(
 		var _p1 = _p0;
 		return A2(f, _p1._0, _p1._1);
 	});
+var _user$project$App$listmapi = F2(
+	function (f, xList) {
+		var xLength = _elm_lang$core$List$length(xList);
+		return A3(
+			_elm_lang$core$List$map2,
+			F2(
+				function (x, i) {
+					return A2(f, i, x);
+				}),
+			xList,
+			A2(_elm_lang$core$List$range, 0, xLength - 1));
+	});
 var _user$project$App$tableStyle = _elm_lang$html$Html_Attributes$style(
 	{
 		ctor: '::',
@@ -255,7 +267,7 @@ var _user$project$App$update = F2(
 										}
 									}())
 							});
-					default:
+					case 'SetQuantity':
 						var _p11 = _p3._0;
 						return _elm_lang$core$Native_Utils.update(
 							model,
@@ -279,9 +291,40 @@ var _user$project$App$update = F2(
 										}
 									}())
 							});
+					default:
+						return _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								orders: A2(
+									_elm_lang$core$List$map,
+									function (tuple) {
+										return _elm_lang$core$Tuple$second(tuple);
+									},
+									A2(
+										_elm_lang$core$List$filter,
+										function (tuple) {
+											return A2(
+												F2(
+													function (x, y) {
+														return !_elm_lang$core$Native_Utils.eq(x, y);
+													}),
+												_p3._0,
+												_elm_lang$core$Tuple$first(tuple));
+										},
+										A2(
+											_user$project$App$listmapi,
+											F2(
+												function (i, x) {
+													return {ctor: '_Tuple2', _0: i, _1: x};
+												}),
+											model.orders)))
+							});
 				}
 			}());
 	});
+var _user$project$App$DeleteOrder = function (a) {
+	return {ctor: 'DeleteOrder', _0: a};
+};
 var _user$project$App$SetQuantity = function (a) {
 	return {ctor: 'SetQuantity', _0: a};
 };
@@ -661,21 +704,112 @@ var _user$project$App$view = function (model) {
 									ctor: '::',
 									_0: A2(
 										_elm_lang$html$Html$div,
-										{ctor: '[]'},
-										A2(
-											_elm_lang$core$List$map,
-											function (x) {
+										{
+											ctor: '::',
+											_0: _user$project$App$tableStyle,
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: function (tableContent) {
 												return A2(
 													_elm_lang$html$Html$div,
-													{ctor: '[]'},
 													{
 														ctor: '::',
-														_0: _elm_lang$html$Html$text(
-															_user$project$App$orderToString(x)),
+														_0: _user$project$App$tableStyle,
+														_1: {ctor: '[]'}
+													},
+													{
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$table,
+															{ctor: '[]'},
+															tableContent),
 														_1: {ctor: '[]'}
 													});
-											},
-											model.orders)),
+											}(
+												A2(
+													F2(
+														function (x, y) {
+															return A2(_elm_lang$core$Basics_ops['++'], x, y);
+														}),
+													{
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$thead,
+															{ctor: '[]'},
+															{
+																ctor: '::',
+																_0: A2(
+																	_elm_lang$html$Html$th,
+																	{ctor: '[]'},
+																	{
+																		ctor: '::',
+																		_0: _elm_lang$html$Html$text('Action'),
+																		_1: {ctor: '[]'}
+																	}),
+																_1: {
+																	ctor: '::',
+																	_0: A2(
+																		_elm_lang$html$Html$th,
+																		{ctor: '[]'},
+																		{
+																			ctor: '::',
+																			_0: _elm_lang$html$Html$text('Delete?'),
+																			_1: {ctor: '[]'}
+																		}),
+																	_1: {ctor: '[]'}
+																}
+															}),
+														_1: {ctor: '[]'}
+													},
+													A2(
+														_user$project$App$listmapi,
+														F2(
+															function (i, x) {
+																return A2(
+																	_elm_lang$html$Html$tr,
+																	{ctor: '[]'},
+																	{
+																		ctor: '::',
+																		_0: A2(
+																			_elm_lang$html$Html$td,
+																			{ctor: '[]'},
+																			{
+																				ctor: '::',
+																				_0: _elm_lang$html$Html$text(
+																					_user$project$App$orderToString(x)),
+																				_1: {ctor: '[]'}
+																			}),
+																		_1: {
+																			ctor: '::',
+																			_0: A2(
+																				_elm_lang$html$Html$td,
+																				{ctor: '[]'},
+																				{
+																					ctor: '::',
+																					_0: A2(
+																						_elm_lang$html$Html$button,
+																						{
+																							ctor: '::',
+																							_0: _elm_lang$html$Html_Events$onClick(
+																								_user$project$App$DeleteOrder(i)),
+																							_1: {ctor: '[]'}
+																						},
+																						{
+																							ctor: '::',
+																							_0: _elm_lang$html$Html$text('X'),
+																							_1: {ctor: '[]'}
+																						}),
+																					_1: {ctor: '[]'}
+																				}),
+																			_1: {ctor: '[]'}
+																		}
+																	});
+															}),
+														model.orders))),
+											_1: {ctor: '[]'}
+										}),
 									_1: {ctor: '[]'}
 								}
 							}

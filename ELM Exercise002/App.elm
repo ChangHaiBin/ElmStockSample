@@ -71,6 +71,7 @@ type Msg
     | SellStock
     | SetPrice String
     | SetQuantity String
+    | DeleteOrder Int
 
 
 buyButtonStyle =
@@ -116,6 +117,20 @@ tableStyle =
         , ( "margin-left", "15%" )
         , ( "margin-right", "15%" )
         ]
+
+
+listmapi f xList =
+    let
+        xLength =
+            xList
+                |> List.length
+    in
+    List.range 0 (xLength - 1)
+        |> List.map2
+            (\x i ->
+                f i x
+            )
+            xList
 
 
 
@@ -208,7 +223,23 @@ view model =
              else
                 [ text model.warning ]
             )
-        , div [] (List.map (\x -> div [] [ x |> orderToString |> text ]) model.orders)
+        , div [ tableStyle ]
+            [ model.orders
+                |> listmapi
+                    (\i x ->
+                        tr []
+                            [ td [] [ x |> orderToString |> text ]
+                            , td [] [ button [ onClick (DeleteOrder i) ] [ text "X" ] ]
+                            ]
+                    )
+                |> (++)
+                    [ thead []
+                        [ th [] [ text "Action" ]
+                        , th [] [ text "Delete?" ]
+                        ]
+                    ]
+                |> (\tableContent -> div [ tableStyle ] [ table [] tableContent ])
+            ]
         ]
 
 
@@ -306,6 +337,24 @@ update msg model =
                                     Err "Quantity must be positive."
                                 else
                                     Ok x
+                            )
+            }
+
+        DeleteOrder n ->
+            { model
+                | orders =
+                    model.orders
+                        |> listmapi (\i x -> ( i, x ))
+                        |> List.filter
+                            (\tuple ->
+                                tuple
+                                    |> Tuple.first
+                                    |> (/=) n
+                            )
+                        |> List.map
+                            (\tuple ->
+                                tuple
+                                    |> Tuple.second
                             )
             }
     )
