@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Random
+import Time exposing (Time, second)
 
 
 -- MODEL
@@ -43,6 +44,7 @@ type alias Model =
     , action : String
     , orders : List Order
     , warning : String
+    , marketPrice : Float
     }
 
 
@@ -57,6 +59,7 @@ init =
             , action = ""
             , orders = []
             , warning = ""
+            , marketPrice = 10.5
             }
     in
     ( initialModel, Cmd.none )
@@ -72,6 +75,8 @@ type Msg
     | SetPrice String
     | SetQuantity String
     | DeleteOrder Int
+    | SetMarketPrice Float
+    | Tick Time
 
 
 buyButtonStyle =
@@ -201,6 +206,8 @@ view model =
 
             --}
             ]
+        , div [] [ text "The market price is a random number between 10.0 to 11.0" ]
+        , div [] [ text ("Current Market Price:" ++ (model.marketPrice |> toString)) ]
         , div [ tableStyle ]
             [ table []
                 [ tr []
@@ -253,114 +260,178 @@ view model =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    (case msg of
-        BuyStock ->
-            ( model.convertedPrice, model.convertedQuantity )
-                ||> Result.map2
-                        (\price quantity ->
-                            let
-                                order =
-                                    { contract = Buy
-                                    , price = price
-                                    , quantity = quantity
-                                    }
-                            in
-                            { model | orders = model.orders ++ [ order ], warning = "" }
-                        )
-                |> (\match ->
-                        case match of
-                            Err warning ->
-                                { model | warning = warning }
+    let
+        newModel =
+            case msg of
+                BuyStock ->
+                    ( model.convertedPrice, model.convertedQuantity )
+                        ||> Result.map2
+                                (\price quantity ->
+                                    let
+                                        order =
+                                            { contract = Buy
+                                            , price = price
+                                            , quantity = quantity
+                                            }
+                                    in
+                                    { model | orders = model.orders ++ [ order ], warning = "" }
+                                )
+                        |> (\match ->
+                                case match of
+                                    Err warning ->
+                                        { model | warning = warning }
 
-                            Ok newModel ->
-                                newModel
-                   )
+                                    Ok newModel ->
+                                        newModel
+                           )
 
-        SellStock ->
-            ( model.convertedPrice, model.convertedQuantity )
-                ||> Result.map2
-                        (\price quantity ->
-                            let
-                                order =
-                                    { contract = Sell
-                                    , price = price
-                                    , quantity = quantity
-                                    }
-                            in
-                            { model | orders = model.orders ++ [ order ], warning = "" }
-                        )
-                |> (\match ->
-                        case match of
-                            Err warning ->
-                                { model | warning = warning }
+                SellStock ->
+                    ( model.convertedPrice, model.convertedQuantity )
+                        ||> Result.map2
+                                (\price quantity ->
+                                    let
+                                        order =
+                                            { contract = Sell
+                                            , price = price
+                                            , quantity = quantity
+                                            }
+                                    in
+                                    { model | orders = model.orders ++ [ order ], warning = "" }
+                                )
+                        |> (\match ->
+                                case match of
+                                    Err warning ->
+                                        { model | warning = warning }
 
-                            Ok newModel ->
-                                newModel
-                   )
+                                    Ok newModel ->
+                                        newModel
+                           )
 
-        SetPrice priceString ->
-            { model
-                | convertedPrice =
-                    (case priceString of
-                        "" ->
-                            Err "No Input"
+                SetPrice priceString ->
+                    { model
+                        | convertedPrice =
+                            (case priceString of
+                                "" ->
+                                    Err "No Input"
 
-                        _ ->
-                            priceString
-                                |> String.toFloat
-                                |> Result.mapError (\_ -> "Invalid Input")
-                    )
-                        |> Result.andThen
-                            (\x ->
-                                if x <= 0.0 then
-                                    Err "Price must be positive."
-                                else
-                                    Ok x
+                                _ ->
+                                    priceString
+                                        |> String.toFloat
+                                        |> Result.mapError (\_ -> "Invalid Input")
                             )
-            }
+                                |> Result.andThen
+                                    (\x ->
+                                        if x <= 0.0 then
+                                            Err "Price must be positive."
+                                        else
+                                            Ok x
+                                    )
+                    }
 
-        SetQuantity quantityString ->
-            { model
-                | convertedQuantity =
-                    (case quantityString of
-                        "" ->
-                            Err "No Input"
+                SetQuantity quantityString ->
+                    { model
+                        | convertedQuantity =
+                            (case quantityString of
+                                "" ->
+                                    Err "No Input"
 
-                        _ ->
-                            quantityString
-                                |> String.toInt
-                                |> Result.mapError (\_ -> "Invalid Input")
-                    )
-                        |> Result.andThen
-                            (\x ->
-                                if x <= 0 then
-                                    Err "Quantity must be positive."
-                                else
-                                    Ok x
+                                _ ->
+                                    quantityString
+                                        |> String.toInt
+                                        |> Result.mapError (\_ -> "Invalid Input")
                             )
-            }
+                                |> Result.andThen
+                                    (\x ->
+                                        if x <= 0 then
+                                            Err "Quantity must be positive."
+                                        else
+                                            Ok x
+                                    )
+                    }
 
-        DeleteOrder n ->
-            { model
-                | orders =
-                    model.orders
-                        |> listmapi (\i x -> ( i, x ))
-                        |> List.filter
-                            (\tuple ->
-                                tuple
-                                    |> Tuple.first
-                                    |> (/=) n
-                            )
-                        |> List.map
-                            (\tuple ->
-                                tuple
-                                    |> Tuple.second
-                            )
-            }
-    )
-        |> (\newModel ->
-                ( newModel, Cmd.none )
-           )
+                DeleteOrder n ->
+                    { model
+                        | orders =
+                            model.orders
+                                |> listmapi (\i x -> ( i, x ))
+                                |> List.filter
+                                    (\tuple ->
+                                        tuple
+                                            |> Tuple.first
+                                            |> (/=) n
+                                    )
+                                |> List.map
+                                    (\tuple ->
+                                        tuple
+                                            |> Tuple.second
+                                    )
+                    }
+
+                Tick newTime ->
+                    model
+
+                SetMarketPrice marketPrice ->
+                    let
+                        remainingOrders =
+                            model.orders
+                                |> List.filter
+                                    (\x ->
+                                        (x.contract == Buy && x.price < marketPrice)
+                                            || (x.contract == Sell && x.price > marketPrice)
+                                    )
+
+                        fulfilledOrders =
+                            model.orders
+                                |> List.filter
+                                    (\x ->
+                                        (x.contract == Buy && x.price >= marketPrice)
+                                            || (x.contract == Sell && x.price <= marketPrice)
+                                    )
+
+                        newAmount =
+                            fulfilledOrders
+                                |> List.map
+                                    (\x ->
+                                        case x.contract of
+                                            Buy ->
+                                                x.quantity
+
+                                            Sell ->
+                                                -x.quantity
+                                    )
+                                |> List.sum
+                                |> (+) model.amount
+
+                        newBalance =
+                            fulfilledOrders
+                                |> List.map
+                                    (\x ->
+                                        case x.contract of
+                                            Buy ->
+                                                -(toFloat x.quantity) * x.price
+
+                                            Sell ->
+                                                toFloat x.quantity * x.price
+                                    )
+                                |> List.sum
+                                |> (+) model.balance
+                    in
+                    { model
+                        | marketPrice = marketPrice
+                        , orders = remainingOrders
+                        , amount = newAmount
+                        , balance = newBalance
+                    }
+
+        newCommand =
+            case msg of
+                Tick newtime ->
+                    Random.generate SetMarketPrice (Random.float 10.0 11.0)
+
+                _ ->
+                    Cmd.none
+    in
+    ( newModel, newCommand )
 
 
 
@@ -369,7 +440,8 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    Time.every second
+        Tick
 
 
 

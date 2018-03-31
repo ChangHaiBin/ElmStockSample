@@ -1,6 +1,3 @@
-var _user$project$App$subscriptions = function (model) {
-	return _elm_lang$core$Platform_Sub$none;
-};
 var _user$project$App_ops = _user$project$App_ops || {};
 _user$project$App_ops['||>'] = F2(
 	function (_p0, f) {
@@ -135,7 +132,8 @@ var _user$project$App$init = function () {
 		convertedQuantity: _elm_lang$core$Result$Err('No Input'),
 		action: '',
 		orders: {ctor: '[]'},
-		warning: ''
+		warning: '',
+		marketPrice: 10.5
 	};
 	return {ctor: '_Tuple2', _0: initialModel, _1: _elm_lang$core$Platform_Cmd$none};
 }();
@@ -165,162 +163,235 @@ var _user$project$App$Order = F3(
 	function (a, b, c) {
 		return {contract: a, price: b, quantity: c};
 	});
-var _user$project$App$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {amount: a, balance: b, convertedPrice: c, convertedQuantity: d, action: e, orders: f, warning: g};
+var _user$project$App$Model = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {amount: a, balance: b, convertedPrice: c, convertedQuantity: d, action: e, orders: f, warning: g, marketPrice: h};
 	});
 var _user$project$App$Sell = {ctor: 'Sell'};
 var _user$project$App$Buy = {ctor: 'Buy'};
+var _user$project$App$Tick = function (a) {
+	return {ctor: 'Tick', _0: a};
+};
+var _user$project$App$subscriptions = function (model) {
+	return A2(_elm_lang$core$Time$every, _elm_lang$core$Time$second, _user$project$App$Tick);
+};
+var _user$project$App$SetMarketPrice = function (a) {
+	return {ctor: 'SetMarketPrice', _0: a};
+};
 var _user$project$App$update = F2(
 	function (msg, model) {
-		return function (newModel) {
-			return {ctor: '_Tuple2', _0: newModel, _1: _elm_lang$core$Platform_Cmd$none};
-		}(
-			function () {
-				var _p3 = msg;
-				switch (_p3.ctor) {
-					case 'BuyStock':
-						return function (match) {
-							var _p4 = match;
-							if (_p4.ctor === 'Err') {
-								return _elm_lang$core$Native_Utils.update(
-									model,
-									{warning: _p4._0});
-							} else {
-								return _p4._0;
-							}
-						}(
-							A2(
-								_user$project$App_ops['||>'],
-								{ctor: '_Tuple2', _0: model.convertedPrice, _1: model.convertedQuantity},
-								_elm_lang$core$Result$map2(
-									F2(
-										function (price, quantity) {
-											var order = {contract: _user$project$App$Buy, price: price, quantity: quantity};
-											return _elm_lang$core$Native_Utils.update(
-												model,
-												{
-													orders: A2(
-														_elm_lang$core$Basics_ops['++'],
-														model.orders,
-														{
-															ctor: '::',
-															_0: order,
-															_1: {ctor: '[]'}
-														}),
-													warning: ''
-												});
-										}))));
-					case 'SellStock':
-						return function (match) {
-							var _p5 = match;
-							if (_p5.ctor === 'Err') {
-								return _elm_lang$core$Native_Utils.update(
-									model,
-									{warning: _p5._0});
-							} else {
-								return _p5._0;
-							}
-						}(
-							A2(
-								_user$project$App_ops['||>'],
-								{ctor: '_Tuple2', _0: model.convertedPrice, _1: model.convertedQuantity},
-								_elm_lang$core$Result$map2(
-									F2(
-										function (price, quantity) {
-											var order = {contract: _user$project$App$Sell, price: price, quantity: quantity};
-											return _elm_lang$core$Native_Utils.update(
-												model,
-												{
-													orders: A2(
-														_elm_lang$core$Basics_ops['++'],
-														model.orders,
-														{
-															ctor: '::',
-															_0: order,
-															_1: {ctor: '[]'}
-														}),
-													warning: ''
-												});
-										}))));
-					case 'SetPrice':
-						var _p8 = _p3._0;
-						return _elm_lang$core$Native_Utils.update(
-							model,
-							{
-								convertedPrice: A2(
-									_elm_lang$core$Result$andThen,
-									function (x) {
-										return (_elm_lang$core$Native_Utils.cmp(x, 0.0) < 1) ? _elm_lang$core$Result$Err('Price must be positive.') : _elm_lang$core$Result$Ok(x);
-									},
-									function () {
-										var _p6 = _p8;
-										if (_p6 === '') {
-											return _elm_lang$core$Result$Err('No Input');
-										} else {
-											return A2(
-												_elm_lang$core$Result$mapError,
-												function (_p7) {
-													return 'Invalid Input';
-												},
-												_elm_lang$core$String$toFloat(_p8));
-										}
-									}())
-							});
-					case 'SetQuantity':
-						var _p11 = _p3._0;
-						return _elm_lang$core$Native_Utils.update(
-							model,
-							{
-								convertedQuantity: A2(
-									_elm_lang$core$Result$andThen,
-									function (x) {
-										return (_elm_lang$core$Native_Utils.cmp(x, 0) < 1) ? _elm_lang$core$Result$Err('Quantity must be positive.') : _elm_lang$core$Result$Ok(x);
-									},
-									function () {
-										var _p9 = _p11;
-										if (_p9 === '') {
-											return _elm_lang$core$Result$Err('No Input');
-										} else {
-											return A2(
-												_elm_lang$core$Result$mapError,
-												function (_p10) {
-													return 'Invalid Input';
-												},
-												_elm_lang$core$String$toInt(_p11));
-										}
-									}())
-							});
-					default:
-						return _elm_lang$core$Native_Utils.update(
-							model,
-							{
-								orders: A2(
-									_elm_lang$core$List$map,
+		var newCommand = function () {
+			var _p3 = msg;
+			if (_p3.ctor === 'Tick') {
+				return A2(
+					_elm_lang$core$Random$generate,
+					_user$project$App$SetMarketPrice,
+					A2(_elm_lang$core$Random$float, 10.0, 11.0));
+			} else {
+				return _elm_lang$core$Platform_Cmd$none;
+			}
+		}();
+		var newModel = function () {
+			var _p4 = msg;
+			switch (_p4.ctor) {
+				case 'BuyStock':
+					return function (match) {
+						var _p5 = match;
+						if (_p5.ctor === 'Err') {
+							return _elm_lang$core$Native_Utils.update(
+								model,
+								{warning: _p5._0});
+						} else {
+							return _p5._0;
+						}
+					}(
+						A2(
+							_user$project$App_ops['||>'],
+							{ctor: '_Tuple2', _0: model.convertedPrice, _1: model.convertedQuantity},
+							_elm_lang$core$Result$map2(
+								F2(
+									function (price, quantity) {
+										var order = {contract: _user$project$App$Buy, price: price, quantity: quantity};
+										return _elm_lang$core$Native_Utils.update(
+											model,
+											{
+												orders: A2(
+													_elm_lang$core$Basics_ops['++'],
+													model.orders,
+													{
+														ctor: '::',
+														_0: order,
+														_1: {ctor: '[]'}
+													}),
+												warning: ''
+											});
+									}))));
+				case 'SellStock':
+					return function (match) {
+						var _p6 = match;
+						if (_p6.ctor === 'Err') {
+							return _elm_lang$core$Native_Utils.update(
+								model,
+								{warning: _p6._0});
+						} else {
+							return _p6._0;
+						}
+					}(
+						A2(
+							_user$project$App_ops['||>'],
+							{ctor: '_Tuple2', _0: model.convertedPrice, _1: model.convertedQuantity},
+							_elm_lang$core$Result$map2(
+								F2(
+									function (price, quantity) {
+										var order = {contract: _user$project$App$Sell, price: price, quantity: quantity};
+										return _elm_lang$core$Native_Utils.update(
+											model,
+											{
+												orders: A2(
+													_elm_lang$core$Basics_ops['++'],
+													model.orders,
+													{
+														ctor: '::',
+														_0: order,
+														_1: {ctor: '[]'}
+													}),
+												warning: ''
+											});
+									}))));
+				case 'SetPrice':
+					var _p9 = _p4._0;
+					return _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							convertedPrice: A2(
+								_elm_lang$core$Result$andThen,
+								function (x) {
+									return (_elm_lang$core$Native_Utils.cmp(x, 0.0) < 1) ? _elm_lang$core$Result$Err('Price must be positive.') : _elm_lang$core$Result$Ok(x);
+								},
+								function () {
+									var _p7 = _p9;
+									if (_p7 === '') {
+										return _elm_lang$core$Result$Err('No Input');
+									} else {
+										return A2(
+											_elm_lang$core$Result$mapError,
+											function (_p8) {
+												return 'Invalid Input';
+											},
+											_elm_lang$core$String$toFloat(_p9));
+									}
+								}())
+						});
+				case 'SetQuantity':
+					var _p12 = _p4._0;
+					return _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							convertedQuantity: A2(
+								_elm_lang$core$Result$andThen,
+								function (x) {
+									return (_elm_lang$core$Native_Utils.cmp(x, 0) < 1) ? _elm_lang$core$Result$Err('Quantity must be positive.') : _elm_lang$core$Result$Ok(x);
+								},
+								function () {
+									var _p10 = _p12;
+									if (_p10 === '') {
+										return _elm_lang$core$Result$Err('No Input');
+									} else {
+										return A2(
+											_elm_lang$core$Result$mapError,
+											function (_p11) {
+												return 'Invalid Input';
+											},
+											_elm_lang$core$String$toInt(_p12));
+									}
+								}())
+						});
+				case 'DeleteOrder':
+					return _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							orders: A2(
+								_elm_lang$core$List$map,
+								function (tuple) {
+									return _elm_lang$core$Tuple$second(tuple);
+								},
+								A2(
+									_elm_lang$core$List$filter,
 									function (tuple) {
-										return _elm_lang$core$Tuple$second(tuple);
+										return A2(
+											F2(
+												function (x, y) {
+													return !_elm_lang$core$Native_Utils.eq(x, y);
+												}),
+											_p4._0,
+											_elm_lang$core$Tuple$first(tuple));
 									},
 									A2(
-										_elm_lang$core$List$filter,
-										function (tuple) {
-											return A2(
-												F2(
-													function (x, y) {
-														return !_elm_lang$core$Native_Utils.eq(x, y);
-													}),
-												_p3._0,
-												_elm_lang$core$Tuple$first(tuple));
-										},
-										A2(
-											_user$project$App$listmapi,
-											F2(
-												function (i, x) {
-													return {ctor: '_Tuple2', _0: i, _1: x};
-												}),
-											model.orders)))
-							});
-				}
-			}());
+										_user$project$App$listmapi,
+										F2(
+											function (i, x) {
+												return {ctor: '_Tuple2', _0: i, _1: x};
+											}),
+										model.orders)))
+						});
+				case 'Tick':
+					return model;
+				default:
+					var _p15 = _p4._0;
+					var fulfilledOrders = A2(
+						_elm_lang$core$List$filter,
+						function (x) {
+							return (_elm_lang$core$Native_Utils.eq(x.contract, _user$project$App$Buy) && (_elm_lang$core$Native_Utils.cmp(x.price, _p15) > -1)) || (_elm_lang$core$Native_Utils.eq(x.contract, _user$project$App$Sell) && (_elm_lang$core$Native_Utils.cmp(x.price, _p15) < 1));
+						},
+						model.orders);
+					var newAmount = A2(
+						F2(
+							function (x, y) {
+								return x + y;
+							}),
+						model.amount,
+						_elm_lang$core$List$sum(
+							A2(
+								_elm_lang$core$List$map,
+								function (x) {
+									var _p13 = x.contract;
+									if (_p13.ctor === 'Buy') {
+										return x.quantity;
+									} else {
+										return 0 - x.quantity;
+									}
+								},
+								fulfilledOrders)));
+					var newBalance = A2(
+						F2(
+							function (x, y) {
+								return x + y;
+							}),
+						model.balance,
+						_elm_lang$core$List$sum(
+							A2(
+								_elm_lang$core$List$map,
+								function (x) {
+									var _p14 = x.contract;
+									if (_p14.ctor === 'Buy') {
+										return (0 - _elm_lang$core$Basics$toFloat(x.quantity)) * x.price;
+									} else {
+										return _elm_lang$core$Basics$toFloat(x.quantity) * x.price;
+									}
+								},
+								fulfilledOrders)));
+					var remainingOrders = A2(
+						_elm_lang$core$List$filter,
+						function (x) {
+							return (_elm_lang$core$Native_Utils.eq(x.contract, _user$project$App$Buy) && (_elm_lang$core$Native_Utils.cmp(x.price, _p15) < 0)) || (_elm_lang$core$Native_Utils.eq(x.contract, _user$project$App$Sell) && (_elm_lang$core$Native_Utils.cmp(x.price, _p15) > 0));
+						},
+						model.orders);
+					return _elm_lang$core$Native_Utils.update(
+						model,
+						{marketPrice: _p15, orders: remainingOrders, amount: newAmount, balance: newBalance});
+			}
+		}();
+		return {ctor: '_Tuple2', _0: newModel, _1: newCommand};
 	});
 var _user$project$App$DeleteOrder = function (a) {
 	return {ctor: 'DeleteOrder', _0: a};
@@ -487,9 +558,9 @@ var _user$project$App$view = function (model) {
 															ctor: '::',
 															_0: _elm_lang$html$Html$text(
 																function (temp) {
-																	var _p12 = temp;
-																	if (_p12.ctor === 'Err') {
-																		return _p12._0;
+																	var _p16 = temp;
+																	if (_p16.ctor === 'Err') {
+																		return _p16._0;
 																	} else {
 																		return 'OK';
 																	}
@@ -549,9 +620,9 @@ var _user$project$App$view = function (model) {
 																ctor: '::',
 																_0: _elm_lang$html$Html$text(
 																	function (temp) {
-																		var _p13 = temp;
-																		if (_p13.ctor === 'Err') {
-																			return _p13._0;
+																		var _p17 = temp;
+																		if (_p17.ctor === 'Err') {
+																			return _p17._0;
 																		} else {
 																			return 'OK';
 																		}
@@ -584,110 +655,10 @@ var _user$project$App$view = function (model) {
 							ctor: '::',
 							_0: A2(
 								_elm_lang$html$Html$div,
+								{ctor: '[]'},
 								{
 									ctor: '::',
-									_0: _user$project$App$tableStyle,
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$table,
-										{ctor: '[]'},
-										{
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$tr,
-												{ctor: '[]'},
-												{
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$td,
-														{ctor: '[]'},
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html$text('Remaining Stock'),
-															_1: {ctor: '[]'}
-														}),
-													_1: {
-														ctor: '::',
-														_0: A2(
-															_elm_lang$html$Html$td,
-															{ctor: '[]'},
-															{
-																ctor: '::',
-																_0: _elm_lang$html$Html$text(
-																	_elm_lang$core$Basics$toString(model.amount)),
-																_1: {ctor: '[]'}
-															}),
-														_1: {ctor: '[]'}
-													}
-												}),
-											_1: {
-												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$tr,
-													{ctor: '[]'},
-													{
-														ctor: '::',
-														_0: A2(
-															_elm_lang$html$Html$td,
-															{ctor: '[]'},
-															{
-																ctor: '::',
-																_0: _elm_lang$html$Html$text('Remaining Balance'),
-																_1: {ctor: '[]'}
-															}),
-														_1: {
-															ctor: '::',
-															_0: A2(
-																_elm_lang$html$Html$td,
-																{ctor: '[]'},
-																{
-																	ctor: '::',
-																	_0: _elm_lang$html$Html$text(
-																		A2(
-																			_elm_lang$core$Basics_ops['++'],
-																			'$',
-																			_elm_lang$core$Basics$toString(model.balance))),
-																	_1: {ctor: '[]'}
-																}),
-															_1: {ctor: '[]'}
-														}
-													}),
-												_1: {
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$tr,
-														{ctor: '[]'},
-														{
-															ctor: '::',
-															_0: A2(
-																_elm_lang$html$Html$td,
-																{ctor: '[]'},
-																{
-																	ctor: '::',
-																	_0: _elm_lang$html$Html$text('Action Taken'),
-																	_1: {ctor: '[]'}
-																}),
-															_1: {
-																ctor: '::',
-																_0: A2(
-																	_elm_lang$html$Html$td,
-																	{ctor: '[]'},
-																	{
-																		ctor: '::',
-																		_0: _elm_lang$html$Html$text(
-																			_elm_lang$core$Basics$toString(model.action)),
-																		_1: {ctor: '[]'}
-																	}),
-																_1: {ctor: '[]'}
-															}
-														}),
-													_1: {ctor: '[]'}
-												}
-											}
-										}),
+									_0: _elm_lang$html$Html$text('The market price is a random number between 10.0 to 11.0'),
 									_1: {ctor: '[]'}
 								}),
 							_1: {
@@ -695,9 +666,13 @@ var _user$project$App$view = function (model) {
 								_0: A2(
 									_elm_lang$html$Html$div,
 									{ctor: '[]'},
-									_elm_lang$core$Native_Utils.eq(model.warning, '') ? {ctor: '[]'} : {
+									{
 										ctor: '::',
-										_0: _elm_lang$html$Html$text(model.warning),
+										_0: _elm_lang$html$Html$text(
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												'Current Market Price:',
+												_elm_lang$core$Basics$toString(model.marketPrice))),
 										_1: {ctor: '[]'}
 									}),
 								_1: {
@@ -711,66 +686,86 @@ var _user$project$App$view = function (model) {
 										},
 										{
 											ctor: '::',
-											_0: function (tableContent) {
-												return A2(
-													_elm_lang$html$Html$div,
-													{
-														ctor: '::',
-														_0: _user$project$App$tableStyle,
-														_1: {ctor: '[]'}
-													},
-													{
-														ctor: '::',
-														_0: A2(
-															_elm_lang$html$Html$table,
-															{ctor: '[]'},
-															tableContent),
-														_1: {ctor: '[]'}
-													});
-											}(
-												A2(
-													F2(
-														function (x, y) {
-															return A2(_elm_lang$core$Basics_ops['++'], x, y);
+											_0: A2(
+												_elm_lang$html$Html$table,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$tr,
+														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$td,
+																{ctor: '[]'},
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html$text('Remaining Stock'),
+																	_1: {ctor: '[]'}
+																}),
+															_1: {
+																ctor: '::',
+																_0: A2(
+																	_elm_lang$html$Html$td,
+																	{ctor: '[]'},
+																	{
+																		ctor: '::',
+																		_0: _elm_lang$html$Html$text(
+																			_elm_lang$core$Basics$toString(model.amount)),
+																		_1: {ctor: '[]'}
+																	}),
+																_1: {ctor: '[]'}
+															}
 														}),
-													{
+													_1: {
 														ctor: '::',
 														_0: A2(
-															_elm_lang$html$Html$thead,
+															_elm_lang$html$Html$tr,
 															{ctor: '[]'},
 															{
 																ctor: '::',
 																_0: A2(
-																	_elm_lang$html$Html$th,
+																	_elm_lang$html$Html$td,
 																	{ctor: '[]'},
 																	{
 																		ctor: '::',
-																		_0: _elm_lang$html$Html$text('Action'),
+																		_0: _elm_lang$html$Html$text('Remaining Balance'),
 																		_1: {ctor: '[]'}
 																	}),
 																_1: {
 																	ctor: '::',
 																	_0: A2(
-																		_elm_lang$html$Html$th,
+																		_elm_lang$html$Html$td,
 																		{ctor: '[]'},
 																		{
 																			ctor: '::',
-																			_0: _elm_lang$html$Html$text('Delete?'),
+																			_0: _elm_lang$html$Html$text(
+																				A2(
+																					_elm_lang$core$Basics_ops['++'],
+																					'$',
+																					_elm_lang$core$Basics$toString(model.balance))),
 																			_1: {ctor: '[]'}
 																		}),
 																	_1: {ctor: '[]'}
 																}
 															}),
-														_1: {ctor: '[]'}
-													},
-													A2(
-														_user$project$App$listmapi,
-														F2(
-															function (i, x) {
-																return A2(
-																	_elm_lang$html$Html$tr,
-																	{ctor: '[]'},
-																	{
+														_1: {
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$tr,
+																{ctor: '[]'},
+																{
+																	ctor: '::',
+																	_0: A2(
+																		_elm_lang$html$Html$td,
+																		{ctor: '[]'},
+																		{
+																			ctor: '::',
+																			_0: _elm_lang$html$Html$text('Action Taken'),
+																			_1: {ctor: '[]'}
+																		}),
+																	_1: {
 																		ctor: '::',
 																		_0: A2(
 																			_elm_lang$html$Html$td,
@@ -778,39 +773,141 @@ var _user$project$App$view = function (model) {
 																			{
 																				ctor: '::',
 																				_0: _elm_lang$html$Html$text(
-																					_user$project$App$orderToString(x)),
+																					_elm_lang$core$Basics$toString(model.action)),
+																				_1: {ctor: '[]'}
+																			}),
+																		_1: {ctor: '[]'}
+																	}
+																}),
+															_1: {ctor: '[]'}
+														}
+													}
+												}),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$div,
+											{ctor: '[]'},
+											_elm_lang$core$Native_Utils.eq(model.warning, '') ? {ctor: '[]'} : {
+												ctor: '::',
+												_0: _elm_lang$html$Html$text(model.warning),
+												_1: {ctor: '[]'}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$div,
+												{
+													ctor: '::',
+													_0: _user$project$App$tableStyle,
+													_1: {ctor: '[]'}
+												},
+												{
+													ctor: '::',
+													_0: function (tableContent) {
+														return A2(
+															_elm_lang$html$Html$div,
+															{
+																ctor: '::',
+																_0: _user$project$App$tableStyle,
+																_1: {ctor: '[]'}
+															},
+															{
+																ctor: '::',
+																_0: A2(
+																	_elm_lang$html$Html$table,
+																	{ctor: '[]'},
+																	tableContent),
+																_1: {ctor: '[]'}
+															});
+													}(
+														A2(
+															F2(
+																function (x, y) {
+																	return A2(_elm_lang$core$Basics_ops['++'], x, y);
+																}),
+															{
+																ctor: '::',
+																_0: A2(
+																	_elm_lang$html$Html$thead,
+																	{ctor: '[]'},
+																	{
+																		ctor: '::',
+																		_0: A2(
+																			_elm_lang$html$Html$th,
+																			{ctor: '[]'},
+																			{
+																				ctor: '::',
+																				_0: _elm_lang$html$Html$text('Action'),
 																				_1: {ctor: '[]'}
 																			}),
 																		_1: {
 																			ctor: '::',
 																			_0: A2(
-																				_elm_lang$html$Html$td,
+																				_elm_lang$html$Html$th,
 																				{ctor: '[]'},
 																				{
 																					ctor: '::',
-																					_0: A2(
-																						_elm_lang$html$Html$button,
-																						{
-																							ctor: '::',
-																							_0: _elm_lang$html$Html_Events$onClick(
-																								_user$project$App$DeleteOrder(i)),
-																							_1: {ctor: '[]'}
-																						},
-																						{
-																							ctor: '::',
-																							_0: _elm_lang$html$Html$text('X'),
-																							_1: {ctor: '[]'}
-																						}),
+																					_0: _elm_lang$html$Html$text('Delete?'),
 																					_1: {ctor: '[]'}
 																				}),
 																			_1: {ctor: '[]'}
 																		}
-																	});
-															}),
-														model.orders))),
+																	}),
+																_1: {ctor: '[]'}
+															},
+															A2(
+																_user$project$App$listmapi,
+																F2(
+																	function (i, x) {
+																		return A2(
+																			_elm_lang$html$Html$tr,
+																			{ctor: '[]'},
+																			{
+																				ctor: '::',
+																				_0: A2(
+																					_elm_lang$html$Html$td,
+																					{ctor: '[]'},
+																					{
+																						ctor: '::',
+																						_0: _elm_lang$html$Html$text(
+																							_user$project$App$orderToString(x)),
+																						_1: {ctor: '[]'}
+																					}),
+																				_1: {
+																					ctor: '::',
+																					_0: A2(
+																						_elm_lang$html$Html$td,
+																						{ctor: '[]'},
+																						{
+																							ctor: '::',
+																							_0: A2(
+																								_elm_lang$html$Html$button,
+																								{
+																									ctor: '::',
+																									_0: _elm_lang$html$Html_Events$onClick(
+																										_user$project$App$DeleteOrder(i)),
+																									_1: {ctor: '[]'}
+																								},
+																								{
+																									ctor: '::',
+																									_0: _elm_lang$html$Html$text('X'),
+																									_1: {ctor: '[]'}
+																								}),
+																							_1: {ctor: '[]'}
+																						}),
+																					_1: {ctor: '[]'}
+																				}
+																			});
+																	}),
+																model.orders))),
+													_1: {ctor: '[]'}
+												}),
 											_1: {ctor: '[]'}
-										}),
-									_1: {ctor: '[]'}
+										}
+									}
 								}
 							}
 						}
