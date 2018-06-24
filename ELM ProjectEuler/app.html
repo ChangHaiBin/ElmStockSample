@@ -9027,127 +9027,11 @@ _user$project$App_ops['|||>'] = F2(
 		var _p1 = _p0;
 		return A3(f, _p1._0, _p1._1, _p1._2);
 	});
-var _user$project$App$generateMortgageStep = F3(
-	function (a, b, c) {
-		return A2(
-			_user$project$App_ops['|||>'],
-			{ctor: '_Tuple3', _0: a, _1: b, _2: c},
-			_elm_lang$core$Result$map3(
-				F3(
-					function (mortgage, interestRate, numYear) {
-						var v = 1.0 / (1.0 + interestRate);
-						var payment = (mortgage * interestRate) / (1.0 - Math.pow(
-							v,
-							_elm_lang$core$Basics$toFloat(numYear)));
-						var firstMortgageStep = {year: 0, principalRemaining: mortgage, interest: mortgage * interestRate, payment: payment};
-						return A3(
-							_elm_lang$core$List$scanl,
-							F2(
-								function (_p2, acc) {
-									var principalRemaining = (acc.principalRemaining + acc.interest) - acc.payment;
-									return _elm_lang$core$Native_Utils.update(
-										acc,
-										{year: acc.year + 1, principalRemaining: principalRemaining, interest: principalRemaining * interestRate});
-								}),
-							firstMortgageStep,
-							A2(_elm_lang$core$List$range, 1, numYear));
-					})));
-	});
-var _user$project$App$update = F2(
-	function (msg, model) {
-		var newModel = function () {
-			var _p3 = msg;
-			switch (_p3.ctor) {
-				case 'Calculate':
-					return _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							schedule: A2(
-								_elm_lang$core$Result$withDefault,
-								model.schedule,
-								A3(_user$project$App$generateMortgageStep, model.mortgageAmount, model.interestRate, model.numYear))
-						});
-				case 'CheckNumYear':
-					var _p6 = _p3._0;
-					return _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							numYear: A2(
-								_elm_lang$core$Result$andThen,
-								function (x) {
-									return (_elm_lang$core$Native_Utils.cmp(x, 0) < 1) ? _elm_lang$core$Result$Err('Too low') : ((_elm_lang$core$Native_Utils.cmp(x, 30) > 0) ? _elm_lang$core$Result$Err('Too high') : _elm_lang$core$Result$Ok(x));
-								},
-								function () {
-									var _p4 = _p6;
-									if (_p4 === '') {
-										return _elm_lang$core$Result$Err('No Input');
-									} else {
-										return A2(
-											_elm_lang$core$Result$mapError,
-											function (_p5) {
-												return 'Invalid Input';
-											},
-											_elm_lang$core$String$toInt(_p6));
-									}
-								}())
-						});
-				case 'CheckInterestRate':
-					var _p9 = _p3._0;
-					return _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							interestRate: A2(
-								_elm_lang$core$Result$andThen,
-								function (x) {
-									return (_elm_lang$core$Native_Utils.cmp(x, 0.0) < 1) ? _elm_lang$core$Result$Err('Too low') : ((_elm_lang$core$Native_Utils.cmp(x, 1.0) > -1) ? _elm_lang$core$Result$Err('Too high') : _elm_lang$core$Result$Ok(x));
-								},
-								function () {
-									var _p7 = _p9;
-									if (_p7 === '') {
-										return _elm_lang$core$Result$Err('No Input');
-									} else {
-										return A2(
-											_elm_lang$core$Result$mapError,
-											function (_p8) {
-												return 'Invalid Input';
-											},
-											_elm_lang$core$String$toFloat(_p9));
-									}
-								}())
-						});
-				default:
-					var _p12 = _p3._0;
-					return _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							mortgageAmount: A2(
-								_elm_lang$core$Result$andThen,
-								function (x) {
-									return (_elm_lang$core$Native_Utils.cmp(x, 0.0) < 1) ? _elm_lang$core$Result$Err('Mortgage amount must be positive.') : _elm_lang$core$Result$Ok(x);
-								},
-								function () {
-									var _p10 = _p12;
-									if (_p10 === '') {
-										return _elm_lang$core$Result$Err('No Input');
-									} else {
-										return A2(
-											_elm_lang$core$Result$mapError,
-											function (_p11) {
-												return 'Invalid Input';
-											},
-											_elm_lang$core$String$toFloat(_p12));
-									}
-								}())
-						});
-			}
-		}();
-		return {ctor: '_Tuple2', _0: newModel, _1: _elm_lang$core$Platform_Cmd$none};
-	});
 var _user$project$App_ops = _user$project$App_ops || {};
 _user$project$App_ops['||>'] = F2(
-	function (_p13, f) {
-		var _p14 = _p13;
-		return A2(f, _p14._0, _p14._1);
+	function (_p2, f) {
+		var _p3 = _p2;
+		return A2(f, _p3._0, _p3._1);
 	});
 var _user$project$App$tableStyle = _elm_lang$html$Html_Attributes$style(
 	{
@@ -9224,32 +9108,255 @@ var _user$project$App$calculateStyle = _elm_lang$html$Html_Attributes$style(
 		}
 	});
 var _user$project$App$init = function () {
-	var initialModel = {
-		mortgageAmount: _elm_lang$core$Result$Err('No Input'),
-		interestRate: _elm_lang$core$Result$Err('No Input'),
-		numYear: _elm_lang$core$Result$Err('No Input'),
-		schedule: {ctor: '[]'}
-	};
+	var initialModel = {userInput: '', question: 1, correct: _elm_lang$core$Maybe$Nothing, userQuestionSelection: '', cannotChangeQuestion: ''};
 	return {ctor: '_Tuple2', _0: initialModel, _1: _elm_lang$core$Platform_Cmd$none};
 }();
-var _user$project$App$MortgageStep = F4(
-	function (a, b, c, d) {
-		return {year: a, principalRemaining: b, interest: c, payment: d};
+var _user$project$App$solutions = _elm_lang$core$Dict$fromList(
+	A2(
+		_elm_lang$core$List$map,
+		function (_p4) {
+			var _p5 = _p4;
+			return {
+				ctor: '_Tuple2',
+				_0: _p5._0,
+				_1: {ctor: '_Tuple2', _0: _p5._1, _1: _p5._2}
+			};
+		},
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple3',
+				_0: 1,
+				_1: '233168',
+				_2: A2(
+					_elm_lang$html$Html$div,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('If we list all the natural numbers below 10 that are multiples of 3 or 5, we get 3, 5, 6 and 9. The sum of these multiples is 23.'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('------'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Find the sum of all the multiples of 3 or 5, from 1 to 999'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					})
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple3',
+					_0: 2,
+					_1: '4613732',
+					_2: A2(
+						_elm_lang$html$Html$div,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Each new term in the Fibonacci sequence is generated by adding the previous two terms. By starting with 1 and 2, the first 10 terms will be:'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('------'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$div,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('1, 2, 3, 5, 8, 13, 21, 34, 55, 89, ...'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$div,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('------'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$div,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text('Find the sum of all EVEN-valued Fibonacci numbers LESS THAN four million.'),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						})
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple3',
+						_0: 3,
+						_1: '6857',
+						_2: A2(
+							_elm_lang$html$Html$div,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('The largest prime factors of 13195 are 5, 7, 13, 29'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$div,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('------'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$div,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('What is the largest prime factor of the number 600851475143?'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
+								}
+							})
+					},
+					_1: {ctor: '[]'}
+				}
+			}
+		}));
+var _user$project$App$getQuestion = function (i) {
+	return A2(
+		_elm_lang$core$Maybe$withDefault,
+		A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{ctor: '[]'}),
+		A2(
+			_elm_lang$core$Maybe$map,
+			_elm_lang$core$Tuple$second,
+			A2(_elm_lang$core$Dict$get, i, _user$project$App$solutions)));
+};
+var _user$project$App$update = F2(
+	function (msg, model) {
+		var newModel = function () {
+			var _p6 = msg;
+			switch (_p6.ctor) {
+				case 'UpdateInput':
+					return _elm_lang$core$Native_Utils.update(
+						model,
+						{userInput: _p6._0, correct: _elm_lang$core$Maybe$Nothing});
+				case 'UpdateQuestionInput':
+					return _elm_lang$core$Native_Utils.update(
+						model,
+						{userQuestionSelection: _p6._0});
+				case 'ChangeQuestion':
+					var _p7 = function () {
+						var _p8 = _elm_lang$core$String$toInt(model.userQuestionSelection);
+						if (_p8.ctor === 'Ok') {
+							var _p10 = _p8._0;
+							var _p9 = A2(_elm_lang$core$Dict$get, _p10, _user$project$App$solutions);
+							if (_p9.ctor === 'Just') {
+								return {ctor: '_Tuple2', _0: _p10, _1: ''};
+							} else {
+								return {ctor: '_Tuple2', _0: model.question, _1: 'Question not found.'};
+							}
+						} else {
+							return {ctor: '_Tuple2', _0: model.question, _1: 'Invalid question number.'};
+						}
+					}();
+					var newQ = _p7._0;
+					var errorMessage = _p7._1;
+					return _elm_lang$core$Native_Utils.update(
+						model,
+						{question: newQ, cannotChangeQuestion: errorMessage});
+				default:
+					return _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							correct: _elm_lang$core$Maybe$Just(
+								A2(
+									_elm_lang$core$Maybe$withDefault,
+									false,
+									A2(
+										_elm_lang$core$Maybe$map,
+										function (_p11) {
+											var _p12 = _p11;
+											return _elm_lang$core$Native_Utils.eq(_p12._0, model.userInput);
+										},
+										A2(_elm_lang$core$Dict$get, model.question, _user$project$App$solutions))))
+						});
+			}
+		}();
+		return {ctor: '_Tuple2', _0: newModel, _1: _elm_lang$core$Platform_Cmd$none};
 	});
-var _user$project$App$Model = F4(
-	function (a, b, c, d) {
-		return {mortgageAmount: a, interestRate: b, numYear: c, schedule: d};
+var _user$project$App$Model = F5(
+	function (a, b, c, d, e) {
+		return {userInput: a, question: b, correct: c, userQuestionSelection: d, cannotChangeQuestion: e};
 	});
-var _user$project$App$CheckNumYear = function (a) {
-	return {ctor: 'CheckNumYear', _0: a};
+var _user$project$App$CheckAnswer = {ctor: 'CheckAnswer'};
+var _user$project$App$ChangeQuestion = {ctor: 'ChangeQuestion'};
+var _user$project$App$UpdateQuestionInput = function (a) {
+	return {ctor: 'UpdateQuestionInput', _0: a};
 };
-var _user$project$App$CheckInterestRate = function (a) {
-	return {ctor: 'CheckInterestRate', _0: a};
+var _user$project$App$UpdateInput = function (a) {
+	return {ctor: 'UpdateInput', _0: a};
 };
-var _user$project$App$CheckMortgageInput = function (a) {
-	return {ctor: 'CheckMortgageInput', _0: a};
-};
-var _user$project$App$Calculate = {ctor: 'Calculate'};
 var _user$project$App$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
@@ -9261,130 +9368,131 @@ var _user$project$App$view = function (model) {
 		{
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$button,
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onClick(_user$project$App$Calculate),
-					_1: {
-						ctor: '::',
-						_0: _user$project$App$calculateStyle,
-						_1: {ctor: '[]'}
-					}
-				},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text('Calculate'),
+					_0: _elm_lang$html$Html$text(
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'QUESTION ',
+							_elm_lang$core$Basics$toString(model.question))),
 					_1: {ctor: '[]'}
 				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
 					_elm_lang$html$Html$div,
+					{ctor: '[]'},
 					{
 						ctor: '::',
-						_0: _user$project$App$tableStyle,
-						_1: {ctor: '[]'}
-					},
-					{
+						_0: _elm_lang$html$Html$text('Change To Question: '),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$input,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$type_('text'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onInput(_user$project$App$UpdateQuestionInput),
+										_1: {ctor: '[]'}
+									}
+								},
+								{ctor: '[]'}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$button,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onClick(_user$project$App$ChangeQuestion),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Change Question'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(model.cannotChangeQuestion),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$table,
+							_elm_lang$html$Html$div,
 							{ctor: '[]'},
 							{
 								ctor: '::',
+								_0: _elm_lang$html$Html$text('---------------------------------------------'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _user$project$App$getQuestion(model.question),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
 								_0: A2(
-									_elm_lang$html$Html$thead,
+									_elm_lang$html$Html$div,
 									{ctor: '[]'},
 									{
 										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$th,
-											{ctor: '[]'},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text('Field'),
-												_1: {ctor: '[]'}
-											}),
-										_1: {
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$th,
-												{ctor: '[]'},
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html$text('User Input'),
-													_1: {ctor: '[]'}
-												}),
-											_1: {
-												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$th,
-													{ctor: '[]'},
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html$text('Validity'),
-														_1: {ctor: '[]'}
-													}),
-												_1: {ctor: '[]'}
-											}
-										}
+										_0: _elm_lang$html$Html$text('------'),
+										_1: {ctor: '[]'}
 									}),
 								_1: {
 									ctor: '::',
 									_0: A2(
-										_elm_lang$html$Html$tr,
+										_elm_lang$html$Html$div,
 										{ctor: '[]'},
 										{
 											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$td,
-												{ctor: '[]'},
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html$text('Mortgage Amount'),
-													_1: {ctor: '[]'}
-												}),
+											_0: _elm_lang$html$Html$text('Answer: '),
 											_1: {
 												ctor: '::',
 												_0: A2(
-													_elm_lang$html$Html$td,
-													{ctor: '[]'},
+													_elm_lang$html$Html$input,
 													{
 														ctor: '::',
-														_0: A2(
-															_elm_lang$html$Html$input,
-															{
-																ctor: '::',
-																_0: _elm_lang$html$Html_Attributes$type_('text'),
-																_1: {
-																	ctor: '::',
-																	_0: _elm_lang$html$Html_Attributes$placeholder('e.g. $1000000'),
-																	_1: {
-																		ctor: '::',
-																		_0: _elm_lang$html$Html_Events$onInput(_user$project$App$CheckMortgageInput),
-																		_1: {ctor: '[]'}
-																	}
-																}
-															},
-															{ctor: '[]'}),
-														_1: {ctor: '[]'}
-													}),
+														_0: _elm_lang$html$Html_Attributes$type_('text'),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Events$onInput(_user$project$App$UpdateInput),
+															_1: {ctor: '[]'}
+														}
+													},
+													{ctor: '[]'}),
 												_1: {
 													ctor: '::',
 													_0: A2(
-														_elm_lang$html$Html$td,
-														{ctor: '[]'},
+														_elm_lang$html$Html$button,
 														{
 															ctor: '::',
-															_0: _elm_lang$html$Html$text(
-																function (temp) {
-																	var _p15 = temp;
-																	if (_p15.ctor === 'Err') {
-																		return _p15._0;
-																	} else {
-																		return 'OK';
-																	}
-																}(model.mortgageAmount)),
+															_0: _elm_lang$html$Html_Events$onClick(_user$project$App$CheckAnswer),
+															_1: {ctor: '[]'}
+														},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('Submit Answer'),
 															_1: {ctor: '[]'}
 														}),
 													_1: {ctor: '[]'}
@@ -9394,279 +9502,31 @@ var _user$project$App$view = function (model) {
 									_1: {
 										ctor: '::',
 										_0: A2(
-											_elm_lang$html$Html$tr,
+											_elm_lang$html$Html$div,
 											{ctor: '[]'},
 											{
 												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$td,
-													{ctor: '[]'},
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html$text('Interest Rate'),
-														_1: {ctor: '[]'}
-													}),
-												_1: {
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$td,
-														{ctor: '[]'},
-														{
-															ctor: '::',
-															_0: A2(
-																_elm_lang$html$Html$input,
-																{
-																	ctor: '::',
-																	_0: _elm_lang$html$Html_Attributes$type_('text'),
-																	_1: {
-																		ctor: '::',
-																		_0: _elm_lang$html$Html_Attributes$placeholder('e.g. 0.0 < x < 1.0'),
-																		_1: {
-																			ctor: '::',
-																			_0: _elm_lang$html$Html_Events$onInput(_user$project$App$CheckInterestRate),
-																			_1: {ctor: '[]'}
-																		}
-																	}
-																},
-																{ctor: '[]'}),
-															_1: {ctor: '[]'}
-														}),
-													_1: {
-														ctor: '::',
-														_0: A2(
-															_elm_lang$html$Html$td,
-															{ctor: '[]'},
-															{
-																ctor: '::',
-																_0: _elm_lang$html$Html$text(
-																	function (temp) {
-																		var _p16 = temp;
-																		if (_p16.ctor === 'Err') {
-																			return _p16._0;
-																		} else {
-																			return 'OK';
-																		}
-																	}(model.interestRate)),
-																_1: {ctor: '[]'}
-															}),
-														_1: {ctor: '[]'}
-													}
-												}
-											}),
-										_1: {
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$tr,
-												{ctor: '[]'},
-												{
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$td,
-														{ctor: '[]'},
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html$text('Num of Year'),
-															_1: {ctor: '[]'}
-														}),
-													_1: {
-														ctor: '::',
-														_0: A2(
-															_elm_lang$html$Html$td,
-															{ctor: '[]'},
-															{
-																ctor: '::',
-																_0: A2(
-																	_elm_lang$html$Html$input,
-																	{
-																		ctor: '::',
-																		_0: _elm_lang$html$Html_Attributes$type_('text'),
-																		_1: {
-																			ctor: '::',
-																			_0: _elm_lang$html$Html_Attributes$placeholder('e.g. 0 < n < 30'),
-																			_1: {
-																				ctor: '::',
-																				_0: _elm_lang$html$Html_Events$onInput(_user$project$App$CheckNumYear),
-																				_1: {ctor: '[]'}
-																			}
-																		}
-																	},
-																	{ctor: '[]'}),
-																_1: {ctor: '[]'}
-															}),
-														_1: {
-															ctor: '::',
-															_0: A2(
-																_elm_lang$html$Html$td,
-																{ctor: '[]'},
-																{
-																	ctor: '::',
-																	_0: _elm_lang$html$Html$text(
-																		function (temp) {
-																			var _p17 = temp;
-																			if (_p17.ctor === 'Err') {
-																				return _p17._0;
-																			} else {
-																				return 'OK';
-																			}
-																		}(model.numYear)),
-																	_1: {ctor: '[]'}
-																}),
-															_1: {ctor: '[]'}
+												_0: _elm_lang$html$Html$text(
+													function () {
+														var _p13 = model.correct;
+														if (_p13.ctor === 'Just') {
+															if (_p13._0 === true) {
+																return 'Correct!';
+															} else {
+																return 'Wrong.';
+															}
+														} else {
+															return '';
 														}
-													}
-												}),
-											_1: {ctor: '[]'}
-										}
+													}()),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
 									}
 								}
-							}),
-						_1: {ctor: '[]'}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$div,
-						{
-							ctor: '::',
-							_0: _user$project$App$tableStyle,
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: function (tableContent) {
-								return A2(
-									_elm_lang$html$Html$div,
-									{
-										ctor: '::',
-										_0: _user$project$App$tableStyle,
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$table,
-											{ctor: '[]'},
-											tableContent),
-										_1: {ctor: '[]'}
-									});
-							}(
-								A2(
-									F2(
-										function (x, y) {
-											return A2(_elm_lang$core$Basics_ops['++'], x, y);
-										}),
-									{
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$thead,
-											{ctor: '[]'},
-											{
-												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$th,
-													{ctor: '[]'},
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html$text('Year'),
-														_1: {ctor: '[]'}
-													}),
-												_1: {
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$th,
-														{ctor: '[]'},
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html$text('Principal Remaining'),
-															_1: {ctor: '[]'}
-														}),
-													_1: {
-														ctor: '::',
-														_0: A2(
-															_elm_lang$html$Html$th,
-															{ctor: '[]'},
-															{
-																ctor: '::',
-																_0: _elm_lang$html$Html$text('Interest'),
-																_1: {ctor: '[]'}
-															}),
-														_1: {
-															ctor: '::',
-															_0: A2(
-																_elm_lang$html$Html$th,
-																{ctor: '[]'},
-																{
-																	ctor: '::',
-																	_0: _elm_lang$html$Html$text('Payment'),
-																	_1: {ctor: '[]'}
-																}),
-															_1: {ctor: '[]'}
-														}
-													}
-												}
-											}),
-										_1: {ctor: '[]'}
-									},
-									A2(
-										_elm_lang$core$List$map,
-										function (x) {
-											return A2(
-												_elm_lang$html$Html$tr,
-												{ctor: '[]'},
-												{
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$td,
-														{ctor: '[]'},
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html$text(
-																_elm_lang$core$Basics$toString(x.year)),
-															_1: {ctor: '[]'}
-														}),
-													_1: {
-														ctor: '::',
-														_0: A2(
-															_elm_lang$html$Html$td,
-															{ctor: '[]'},
-															{
-																ctor: '::',
-																_0: _elm_lang$html$Html$text(
-																	_elm_lang$core$Basics$toString(x.principalRemaining)),
-																_1: {ctor: '[]'}
-															}),
-														_1: {
-															ctor: '::',
-															_0: A2(
-																_elm_lang$html$Html$td,
-																{ctor: '[]'},
-																{
-																	ctor: '::',
-																	_0: _elm_lang$html$Html$text(
-																		_elm_lang$core$Basics$toString(x.interest)),
-																	_1: {ctor: '[]'}
-																}),
-															_1: {
-																ctor: '::',
-																_0: A2(
-																	_elm_lang$html$Html$td,
-																	{ctor: '[]'},
-																	{
-																		ctor: '::',
-																		_0: _elm_lang$html$Html$text(
-																			_elm_lang$core$Basics$toString(x.payment)),
-																		_1: {ctor: '[]'}
-																	}),
-																_1: {ctor: '[]'}
-															}
-														}
-													}
-												});
-										},
-										model.schedule))),
-							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
+							}
+						}
+					}
 				}
 			}
 		});
