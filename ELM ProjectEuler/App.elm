@@ -32,11 +32,166 @@ solutions =
             ]
       )
     , ( 3
-      , "6857"
+      , "659"
       , div []
-            [ div [] [ "The largest prime factors of 13195 are 5, 7, 13, 29" |> text ]
+            [ div [] [ "Modified Question! NOT ORIGINAL question." |> text ]
             , div [] [ "------" |> text ]
-            , div [] [ "What is the largest prime factor of the number 600851475143?" |> text ]
+            , div [] [ "The largest prime factors of 13195 are 5, 7, 13, 29" |> text ]
+            , div [] [ "------" |> text ]
+            , div [] [ "What is the largest prime factor of the number 269531?" |> text ]
+            ]
+      )
+    , ( 4
+      , "906609"
+      , div []
+            [ div [] [ "A palindromic number reads the same both ways. e.g. 192291, 1258521." |> text ]
+            , div [] [ "------" |> text ]
+            , div [] [ "For y = a x b, where 1 <= a, b <= 99" |> text ]
+            , div [] [ "the largest palindromic number y is 9009 = 91 x 99" |> text ]
+            , div [] [ "------" |> text ]
+            , div [] [ "What is the largest palindromic number y = a x b" |> text ]
+            , div [] [ "where 1 <= a , b <= 999?" |> text ]
+            ]
+      )
+    , ( 5
+      , "360360"
+      , div []
+            [ div [] [ "Modified Question! NOT ORIGINAL question." |> text ]
+            , div [] [ "------" |> text ]
+            , div [] [ "2520 is the smallest number that can be divided by each of the numbers from 1 to 10 without any remainder." |> text ]
+            , div [] [ "------" |> text ]
+            , div [] [ "What is the smallest number that is evenly divisible by all the numbers from 5 to 15 (both inclusive)?" |> text ]
+            ]
+      )
+    , ( 6
+      , "25164150"
+      , div []
+            [ div [] [ "(1 +2 + ...... + 10)^2 - (1^2 + 2^2 + ..... + 10^2)" |> text ]
+            , div [] [ "= 55^2 - 385 = 3025 - 385 = 2640" |> text ]
+            , div [] [ "------" |> text ]
+            , div [] [ "Calculate (1 + 2 + 3 + ...... + 100)^2 - (1^2 + 2^2 + ...... + 100^2)" |> text ]
+            ]
+      )
+    , ( 7
+      , "104743"
+      , div []
+            [ div [] [ "By listing the first six prime numbers: 2, 3, 5, 7, 11, and 13, we can see that the 6th prime is 13." |> text ]
+            , div [] [ "------" |> text ]
+            , div [] [ "What is the 10001st prime number?" |> text ]
+            ]
+      )
+    , ( 8
+      , "46080"
+      , div []
+            [ div [] [ "Modified Question! NOT ORIGINAL question." |> text ]
+            , div [] [ "------" |> text ]
+            , div [] [ "From this 50-digit number:" |> text ]
+            , div [] [ "73167176531330624919225119674426574742355349194934" |> text ]
+            , div [] [ "--" |> text ]
+            , div [] [ "The four adjacent digits that have the greatest product are 9 x 6 x 7 x 4 = 1512" |> text ]
+            , div [] [ "---------------" |> text ]
+            , div [] [ "What is the product of the six-adjacent digits that have the greatest product for the following 50-digit number?" |> text ]
+            , div [] [ "17866458359124566529476545682848912883142607690042" |> text ]
+            ]
+      )
+    , ( 9
+      , "31875000"
+      , div []
+            [ div [] [ "A Pythagorean triplet is a set of three natural numbers, a < b < c, for which" |> text ]
+            , div [] [ "a^2 + b^2 = c^2" |> text ]
+            , div [] [ "--" |> text ]
+            , div [] [ "For example, 3^2 + 4^2 = 5^2." |> text ]
+            , div [] [ "------" |> text ]
+            , div [] [ "there exists exactly one Pythagorean triplet for which a + b + c = 1000." |> text ]
+            , div [] [ "Find the product a x b x c." |> text ]
+            ]
+      )
+    , ( 10
+      , "5736396"
+      , div []
+            [ div [] [ "Modified Question! NOT ORIGINAL question." |> text ]
+            , div [] [ "------" |> text ]
+            , div [] [ "The sum of the primes below 10 is 2 + 3 + 5 + 7 = 17." |> text ]
+            , div [] [ "------" |> text ]
+            , div [] [ "What is the sum of all prime numbers below 10000?" |> text ]
+            ]
+      )
+    , ( 11
+      , "70600674"
+      , div []
+            [ div [] [ "You are given a 20x20 grid below." |> text ]
+            , div [] [ "08 02 22 97 38 15 00 40 00 75 04 05 07 78 52 12 50 77 91 08" |> text ]
+            , div [] [ "49 49 99 40 17 81 18 57 60 87 17 40 98 43 69 48 04 56 62 00" |> text ]
+            , div [] [ "81 49 31 73 55 79 14 29 93 71 40 67 53 88 30 03 49 13 36 65" |> text ]
+            , div [] [ "52 70 95 23 04 60 11 42 69 24 68 56 01 32 56 71 37 02 36 91" |> text ]
+            , div [] [ "22 31 16 71 51 67 63 89 41 92 36 54 22 40 40 28 66 33 13 80" |> text ]
+            , div [] [ "24 47 32 60 99 03 45 02 44 75 33 53 78 36 84 20 35 17 12 50" |> text ]
+            , div [] [ "32 98 81 28 64 23 67 10 26 38 40 67 59 54 70 66 18 38 64 70" |> text ]
+            , div [] [ "67 26 20 68 02 62 12 20 95 63 94 39 63 08 40 91 66 49 94 21" |> text ]
+            , div [] [ "24 55 58 05 66 73 99 26 97 17 78 78 96 83 14 88 34 89 63 72" |> text ]
+            , div [] [ "21 36 23 09 75 00 76 44 20 45 35 14 00 61 33 97 34 31 33 95" |> text ]
+            , div [] [ "78 17 53 28 22 75 31 67 15 94 03 80 04 62 16 14 09 53 56 92" |> text ]
+            , div [] [ "16 39 05 42 96 35 31 47 55 58 88 24 00 17 54 24 36 29 85 57" |> text ]
+            , div [] [ "86 56 00 48 35 71 89 07 05 44 44 37 44 60 21 58 51 54 17 58" |> text ]
+            , div [] [ "19 80 81 68 05 94 47 69 28 73 92 13 86 52 17 77 04 89 55 40" |> text ]
+            , div [] [ "04 52 08 83 97 35 99 16 07 97 57 32 16 26 26 79 33 27 98 66" |> text ]
+            , div [] [ "88 36 68 87 57 62 20 72 03 46 33 67 46 55 12 32 63 93 53 69" |> text ]
+            , div [] [ "04 42 16 73 38 25 39 11 24 94 72 18 08 46 29 32 40 62 76 36" |> text ]
+            , div [] [ "20 69 36 41 72 30 23 88 34 62 99 69 82 67 59 85 74 04 36 16" |> text ]
+            , div [] [ "20 73 35 29 78 31 90 01 74 31 49 71 48 86 81 16 23 57 05 54" |> text ]
+            , div [] [ "01 70 54 71 83 51 54 69 16 92 33 48 61 43 52 01 89 19 67 48" |> text ]
+            , div [] [ "-------" |> text ]
+            , div [] [ "On the lower left corner, we can see four numbers, 04, 69, 35, 71, located on the same diagonal line." |> text ]
+            , div [] [ "------" |> text ]
+            , div [] [ "The product of these numbers is 04 x 69 x 35 x 71 = 685860." |> text ]
+            , div [] [ "------" |> text ]
+            , div [] [ "Warning: There are two different directions of diagonal." |> text ]
+            , div [] [ "------" |> text ]
+            , div [] [ "What is the greatest product of four adjacent numbers in the same direction (vertical, horizontal, or diagonal) in the 20 x 20 grid?" |> text ]
+            ]
+      )
+    , ( 12
+      , "76576500"
+      , div []
+            [ div [] [ "The sequence of triangle numbers is generated by adding the natural numbers. So the 7th triangle number would be 1 + 2 + 3 + 4 + 5 + 6 + 7 = 28. " |> text ]
+            , div [] [ "The first ten terms would be:" |> text ]
+            , div [] [ "1, 3, 6, 10, 15, 21, 28, 36, 45, 55, ..." |> text ]
+            , div [] [ "------" |> text ]
+            , div [] [ "Let us list the factors of the first seven triangle numbers:" |> text ]
+            , div [] [ "The first ten terms would be:" |> text ]
+            , table []
+                [ tr []
+                    [ td [] [ "1: " |> text ]
+                    , td [] [ "1" |> text ]
+                    ]
+                , tr []
+                    [ td [] [ "3:" |> text ]
+                    , td [] [ "1,3" |> text ]
+                    ]
+                , tr []
+                    [ td [] [ "6:" |> text ]
+                    , td [] [ "1,2,3,6" |> text ]
+                    ]
+                , tr []
+                    [ td [] [ "10:" |> text ]
+                    , td [] [ "1,2,5,10" |> text ]
+                    ]
+                , tr []
+                    [ td [] [ "15:" |> text ]
+                    , td [] [ "1,3,5,15" |> text ]
+                    ]
+                , tr []
+                    [ td [] [ "21:" |> text ]
+                    , td [] [ "1,3,7,21" |> text ]
+                    ]
+                , tr []
+                    [ td [] [ "28:" |> text ]
+                    , td [] [ "1,2,4,7,14,28" |> text ]
+                    ]
+                ]
+            , div [] [ "We can see that 28 is the first triangle number to have over five divisors." |> text ]
+            , div [] [ "----" |> text ]
+            , div [] [ "What is the value of the first triangle number to have over five hundred divisors?" |> text ]
             ]
       )
     ]
@@ -124,26 +279,18 @@ getQuestion i =
 view : Model -> Html Msg
 view model =
     div [ backgroundStyle ]
-        [ div [] [ "QUESTION " ++ toString model.question |> text ]
-
-        {--
-        , div []
-            [ List.range 1 50
-                |> List.scanl (\_ ( x, y ) -> ( y, x + y )) ( 1, 2 )
-                |> List.map Tuple.first
-                |> List.filter (\x -> x < 4000000)
-                |> List.filter (\x -> x % 2 == 0)
-                |> List.sum
-                |> toString
-                |> text
-            ]
-            --}
+        [ div [] [ "Modified Project Euler Questions for Teaching Purposes." |> text ]
+        , div [] [ "Copyright Chang HaiBin, 2018" |> text ]
+        , div [] [ "----------------------------------" |> text ]
+        , div [] [ "----------------------------------" |> text ]
+        , div [] [ "QUESTION " ++ toString model.question |> text ]
         , div []
             [ "Change To Question: " |> text
             , input [ type_ "text", onInput UpdateQuestionInput ] []
             , button [ onClick ChangeQuestion ] [ text "Change Question" ]
             ]
         , div [] [ model.cannotChangeQuestion |> text ]
+        , div [] [ "---------------------------------------------" |> text ]
         , div [] [ "---------------------------------------------" |> text ]
         , div [] [ getQuestion model.question ]
         , div [] [ "------" |> text ]
